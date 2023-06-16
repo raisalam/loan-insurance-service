@@ -10,7 +10,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import se.sbab.insurance.model.request.KreApplicationRequest;
 import se.sbab.insurance.model.request.InsurancePremiumRequest;
+
+import java.util.List;
 
 /**
  * The type Insurance premium controller integration test.
@@ -53,6 +56,25 @@ public class InsurancePremiumControllerIntegrationTest {
         .andExpect(MockMvcResultMatchers.jsonPath("$.monthlyIncomeInsurancePremium").value(5100.0))
         .andExpect(MockMvcResultMatchers.jsonPath("$.totalMonthlyPremium").value(10200.0))
         .andReturn().getResponse().getContentAsString();
+  }
+
+  @Test
+  void testKreParts() throws Exception {
+    // Prepare the request body
+    KreApplicationRequest request = new KreApplicationRequest();
+    request.setKreIds(List.of(1l,2l,3l, 4l, 5l));
+
+    // Prepare the request
+    MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+            .get("/v1/insurance/kreparts")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request));
+
+    // Perform the request and validate the response
+    String response = mockMvc.perform(requestBuilder)
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andReturn().getResponse().getContentAsString();
+    System.out.println("Response string == "+response);
   }
 }
 
